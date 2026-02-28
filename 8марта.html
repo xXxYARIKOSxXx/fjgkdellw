@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Секретный код · С 8 марта</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.4s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* экран ввода кода */
+        .code-screen {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 48px;
+            padding: 3rem 2.5rem;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 215, 0, 0.1) inset;
+            text-align: center;
+            z-index: 20;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .code-screen.hidden {
+            opacity: 0;
+            transform: scale(0.8) translateY(30px);
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .code-screen h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9d423, #fdaa8b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px #ffb34780;
+        }
+
+        .code-screen p {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 1.2rem 1.8rem;
+            font-size: 1.5rem;
+            background: rgba(10, 10, 20, 0.7);
+            border: 2px solid #ffb6c1;
+            border-radius: 60px;
+            color: white;
+            text-align: center;
+            letter-spacing: 2px;
+            outline: none;
+            transition: 0.25s;
+            box-shadow: 0 0 20px #ff69b480;
+        }
+
+        .code-input:focus {
+            border-color: #ffd966;
+            box-shadow: 0 0 35px #fabc3c;
+            transform: scale(1.02);
+        }
+
+        .code-input::placeholder {
+            color: #aaaac0;
+            font-size: 1rem;
+            letter-spacing: normal;
+        }
+
+        .error-message {
+            color: #ff9f8c;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            min-height: 2.5rem;
+            text-shadow: 0 0 8px red;
+        }
+
+        /* основное поздравление */
+        .congrats-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2vh 1rem 0;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+            pointer-events: none;
+            overflow-y: auto;
+        }
+
+        .congrats-screen.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* контейнер с основным текстом */
+        .greeting-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 70px 20px 70px 20px;
+            padding: 2rem 2rem;
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(255, 255, 255, 0.3) inset;
+            animation: float 4s infinite ease-in-out;
+            transition: background 0.3s, border-color 0.3s;
+            margin-top: 5vh;
+            margin-bottom: 2vh;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .greeting-card h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 0 5px 20px currentColor;
+            letter-spacing: 2px;
+            margin-bottom: 0.8rem;
+            word-break: break-word;
+        }
+
+        .greeting-card p {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .flower-emoji {
+            font-size: 2.8rem;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3));
+            animation: rotateFlower 6s infinite;
+        }
+
+        @keyframes rotateFlower {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ КАРТИНКИ */
+        .image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1vh;
+            margin-bottom: 3vh;
+            padding: 0 1rem;
+        }
+
+        /* Стили для картинки */
+        .congrats-image {
+            max-width: min(500px, 90%);
+            width: auto;
+            height: auto;
+            max-height: 30vh;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.3);
+            object-fit: cover;
+            transition: transform 0.3s ease;
+            display: block;
+        }
+
+        .congrats-image:hover {
+            transform: scale(1.02);
+        }
+
+        /* заглушка для картинки */
+        .image-placeholder {
+            max-width: min(500px, 90%);
+            width: 100%;
+            height: 30vh;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #f9d423, #fdaa8b);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .placeholder-text {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        /* падающие сердечки */
+        #hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.7;
+            user-select: none;
+            animation: fall linear infinite;
+            top: -10%;
+            filter: drop-shadow(0 0 10px currentColor);
+            will-change: transform;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.2; }
+        }
+
+        /* салют (canvas) */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        /* скрытые классы */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Адаптив */
+        @media (max-width: 768px) {
+            .greeting-card {
+                padding: 1.5rem 1.2rem;
+                margin-top: 3vh;
+            }
+            
+            .greeting-card h2 { 
+                font-size: 2.5rem; 
+            }
+            
+            .greeting-card p { 
+                font-size: 1.4rem; 
+            }
+            
+            .flower-emoji {
+                font-size: 2.2rem;
+            }
+            
+            .congrats-image,
+            .image-placeholder {
+                max-height: 25vh;
+                border-radius: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .greeting-card {
+                padding: 1.2rem 1rem;
+                margin-top: 2vh;
+            }
+            
+            .greeting-card h2 { 
+                font-size: 2rem; 
+            }
+            
+            .greeting-card p { 
+                font-size: 1.2rem; 
+                margin-bottom: 1rem;
+            }
+            
+            .flower-emoji {
+                font-size: 1.8rem;
+            }
+            
+            .congrats-image,
+            .image-placeholder {
+                max-height: 22vh;
+                max-width: 95%;
+                border-radius: 15px;
+            }
+            
+            .code-screen { 
+                padding: 2rem 1.5rem; 
+            }
+            
+            .code-input { 
+                font-size: 1.2rem; 
+            }
+        }
+
+        @media (min-height: 900px) {
+            .greeting-card {
+                margin-top: 8vh;
+            }
+            
+            .congrats-image,
+            .image-placeholder {
+                max-height: 25vh;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .greeting-card {
+                padding: 1rem;
+                margin-top: 2vh;
+            }
+            
+            .greeting-card h2 {
+                font-size: 2rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .greeting-card p {
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .flower-emoji {
+                font-size: 1.5rem;
+            }
+            
+            .congrats-image,
+            .image-placeholder {
+                max-height: 20vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЭКРАН ВВОДА КОДА -->
+    <div class="code-screen" id="codeScreen">
+        <h1>✧ Секретный код ✧</h1>
+        <p>Введи код доступа, чтобы открыть поздравление</p>
+        <input type="text" class="code-input" id="codeInput" placeholder="****" autofocus>
+        <div class="error-message" id="errorMsg"></div>
+    </div>
+
+    <!-- ПОЗДРАВЛЕНИЕ -->
+    <div class="congrats-screen" id="congratsScreen">
+        <div class="greeting-card" id="greetingCard">
+            <h2 id="greetingTitle">С 8 марта!</h2>
+            <p id="greetingText">Пусть сбываются мечты</p>
+            <div class="flower-emoji">🌸🌷🌺</div>
+        </div>
+        <div class="image-container" id="imageContainer">
+            <!-- Картинка будет добавлена через JavaScript с обработкой ошибок -->
+        </div>
+    </div>
+    
+    <div id="hearts-container"></div>
+    <canvas id="fireworks-canvas"></canvas>
+
+    <script>
+        (function() {
+            const validCodes = {
+                '1': "55sdfkow78/",
+                '2': "89hjklqw23@",
+                '3': "12mnbvc7xz#",
+                '4': "34qwertyui%",
+                '5': "67asdfghjk^",
+                '6': "90zxcvbnm&",
+                '7': "23poiuytre*",
+                '8': "45lkjhgfds(",
+                '9': "78mnbvcxz)",
+                '10': "01qazwsxed_"
+            };
+            const themeColors = {
+                1: { bg: '#FCE570', card: '#FFE55C', text: '#B8860B', heart: '#FCE570' },
+                2: { bg: '#7BD3EA', card: '#A4E5FF', text: '#025E8F', heart: '#7BD3EA' },
+                3: { bg: '#FF6B6B', card: '#FF8A8A', text: '#A50000', heart: '#FF6B6B' },
+                4: { bg: '#A7E0A0', card: '#C0F0B8', text: '#1F6D1F', heart: '#A7E0A0' },
+                5: { bg: '#FFB27F', card: '#FFCA9F', text: '#B14500', heart: '#FFB27F' },
+                6: { bg: '#D9A5FF', card: '#E9C2FF', text: '#4B0082', heart: '#D9A5FF' },
+                7: { bg: '#FF99C8', card: '#FFB8D9', text: '#B32E5F', heart: '#FF99C8' },
+                8: { bg: '#A6E0FA', card: '#C2ECFF', text: '#005A8C', heart: '#A6E0FA' },
+                9: { bg: '#F5E56B', card: '#FFF0A5', text: '#8B6B00', heart: '#F5E56B' },
+                10: { bg: '#B0E57C', card: '#D0F0B0', text: '#236B2E', heart: '#B0E57C' }
+            };
+
+            // элементы
+            const codeScreen = document.getElementById('codeScreen');
+            const congratsScreen = document.getElementById('congratsScreen');
+            const codeInput = document.getElementById('codeInput');
+            const errorMsg = document.getElementById('errorMsg');
+            const greetingCard = document.getElementById('greetingCard');
+            const greetingTitle = document.getElementById('greetingTitle');
+            const greetingText = document.getElementById('greetingText');
+            const imageContainer = document.getElementById('imageContainer');
+            const bodyEl = document.body;
+            const heartsContainer = document.getElementById('hearts-container');
+
+            // салют
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationFrame = null;
+            let fireworksActive = false;
+
+            // для падающих сердец
+            let heartInterval = null;
+            let currentHeartColor = '#FCE570';
+
+            // ---- функции для отображения картинки с запасным вариантом ----
+            function loadImageWithFallback(container, imageUrl) {
+                // Очищаем контейнер
+                container.innerHTML = '';
+                
+                // Создаем элемент изображения
+                const img = new Image();
+                
+                // Функция для создания заглушки
+                const showPlaceholder = () => {
+                    container.innerHTML = `
+                        <div class="image-placeholder">
+                            <div>🌸🌷🌺</div>
+                            <div class="placeholder-text">С 8 марта!</div>
+                        </div>
+                    `;
+                };
+                
+                // Обработчик успешной загрузки
+                img.onload = function() {
+                    // Изображение загрузилось успешно
+                    img.className = 'congrats-image';
+                    container.appendChild(img);
+                };
+                
+                // Обработчик ошибки загрузки
+                img.onerror = function() {
+                    console.log('Не удалось загрузить изображение, используем заглушку');
+                    showPlaceholder();
+                };
+                
+                // Устанавливаем атрибуты и начинаем загрузку
+                img.src = imageUrl;
+                img.alt = 'С 8 марта! Весенние цветы';
+                img.loading = 'lazy';
+                
+                // Добавляем crossorigin атрибут для решения проблем с CORS
+                img.crossOrigin = 'anonymous';
+            }
+
+            // ---- функции для сердец ----
+            function startHearts(color) {
+                if (heartInterval) clearInterval(heartInterval);
+                currentHeartColor = color;
+                for (let i = 0; i < 35; i++) {
+                    setTimeout(() => createHeart(color), i * 80);
+                }
+                heartInterval = setInterval(() => createHeart(color), 380);
+            }
+
+            function createHeart(color) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                const hearts = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤍', '💖', '💗', '💓', '💞'];
+                const randomHeart = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.textContent = randomHeart;
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                heart.style.fontSize = (Math.random() * 1.8 + 1.2) + 'rem';
+                heart.style.color = color;
+                heart.style.textShadow = `0 0 15px ${color}`;
+                heart.style.opacity = '0.9';
+                heartsContainer.appendChild(heart);
+
+                setTimeout(() => {
+                    if (heart.parentNode) heart.remove();
+                }, 8000);
+            }
+
+            function stopHearts() {
+                if (heartInterval) {
+                    clearInterval(heartInterval);
+                    heartInterval = null;
+                }
+                heartsContainer.innerHTML = '';
+            }
+
+            // ---- функции салюта ----
+            function startFireworks(primaryColor) {
+                if (fireworksActive) return;
+                fireworksActive = true;
+
+                const rgb = hexToRgb(primaryColor) || { r: 255, g: 200, b: 100 };
+                const palette = [primaryColor, `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`, '#FFFFFF', '#FFD700', '#FFA500'];
+
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+
+                class Particle {
+                    constructor(x, y, color) {
+                        this.x = x;
+                        this.y = y;
+                        this.vx = (Math.random() - 0.5) * 6;
+                        this.vy = (Math.random() - 0.5) * 6;
+                        this.size = Math.random() * 4 + 2;
+                        this.color = color;
+                        this.alpha = 1;
+                        this.life = 1;
+                        this.decay = 0.015 + Math.random() * 0.02;
+                    }
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        this.vy += 0.05;
+                        this.alpha -= this.decay;
+                        this.life -= this.decay;
+                    }
+                    draw() {
+                        ctx.globalAlpha = this.alpha;
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function createFirework() {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.6;
+                    const count = 40 + Math.floor(Math.random() * 40);
+                    const baseColor = palette[Math.floor(Math.random() * palette.length)];
+                    for (let i = 0; i < count; i++) {
+                        const offsetColor = `hsl(${Math.random() * 60 + (parseInt(primaryColor.substring(1), 16) % 360)}, 80%, 60%)`;
+                        particles.push(new Particle(x, y, i % 3 === 0 ? baseColor : offsetColor));
+                    }
+                }
+
+                function animateFireworks() {
+                    if (!fireworksActive) return;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.globalCompositeOperation = 'lighter';
+
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const p = particles[i];
+                        p.update();
+                        p.draw();
+                        if (p.alpha <= 0.02 || p.life <= 0) {
+                            particles.splice(i, 1);
+                        }
+                    }
+
+                    ctx.globalCompositeOperation = 'source-over';
+                    animationFrame = requestAnimationFrame(animateFireworks);
+                }
+
+                const fireInterval = setInterval(() => {
+                    if (!fireworksActive) {
+                        clearInterval(fireInterval);
+                        return;
+                    }
+                    createFirework();
+                    if (Math.random() > 0.5) createFirework();
+                }, 600);
+
+                animateFireworks();
+
+                window.fireworkCleanup = () => {
+                    fireworksActive = false;
+                    clearInterval(fireInterval);
+                    if (animationFrame) {
+                        cancelAnimationFrame(animationFrame);
+                        animationFrame = null;
+                    }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles = [];
+                };
+            }
+
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            // ---- обработка успешного кода ----
+            function applyCode(codeKey) {
+                const key = parseInt(codeKey);
+                if (key < 1 || key > 10) return;
+
+                const colors = themeColors[key];
+                
+                // фон body
+                bodyEl.style.backgroundColor = colors.bg;
+                bodyEl.style.background = colors.bg;
+                
+                // карточка поздравления
+                greetingCard.style.backgroundColor = colors.card;
+                greetingCard.style.borderColor = colors.text;
+                greetingCard.style.color = colors.text;
+                
+                // текст внутри карточки
+                greetingTitle.style.color = colors.text;
+                greetingText.style.color = colors.text;
+                
+                // цвет падающих сердец
+                currentHeartColor = colors.bg;
+
+                // меняем текст поздравления
+                const messages = [
+                    { title: 'С 8 марта!', text: 'Сияй ярко ✨' },
+                    { title: 'С праздником весны!', text: 'Будь счастлива!' },
+                    { title: 'Happy Women\'s Day', text: 'Ты прекрасна!' },
+                    { title: 'С 8 Марта!', text: 'Любви и цветов' },
+                    { title: 'Богиня!', text: 'Восхитительной весны' },
+                ];
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                greetingTitle.textContent = randomMsg.title;
+                greetingText.textContent = randomMsg.text;
+
+                // переключаем экраны
+                codeScreen.classList.add('hidden');
+                congratsScreen.classList.add('visible');
+
+                // загружаем картинку с обработкой ошибок
+                loadImageWithFallback(imageContainer, 'https://i.postimg.cc/HWrQX6Wb/IMG-5769.jpg');
+
+                // сердечки
+                stopHearts();
+                startHearts(colors.bg);
+
+                // фейерверки
+                if (window.fireworkCleanup) window.fireworkCleanup();
+                startFireworks(colors.bg);
+            }
+
+            // ---- обработка ввода ----
+            codeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const inputValue = codeInput.value.trim();
+                    let foundKey = null;
+                    for (let [key, code] of Object.entries(validCodes)) {
+                        if (code === inputValue) {
+                            foundKey = key;
+                            break;
+                        }
+                    }
+
+                    if (foundKey) {
+                        errorMsg.textContent = '';
+                        applyCode(foundKey);
+                    } else {
+                        errorMsg.textContent = '❌ Неверный код, попробуй ещё';
+                        codeInput.classList.add('error-shake');
+                        setTimeout(() => codeInput.classList.remove('error-shake'), 500);
+                    }
+                }
+            });
+
+            // очистка
+            stopHearts();
+            if (window.fireworkCleanup) window.fireworkCleanup();
+
+            // начальный градиент
+            bodyEl.style.background = 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)';
+
+        })();
+    </script>
+    <style>
+        .error-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff5252 !important;
+            box-shadow: 0 0 25px #ff5252;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+    </style>
+</body>
+</html>
