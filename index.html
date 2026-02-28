@@ -110,13 +110,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-start; /* Изменено с center на flex-start */
             padding: 2vh 1rem 0;
             z-index: 15;
             opacity: 0;
             transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
             pointer-events: none;
-            overflow-y: auto;
+            overflow-y: auto; /* Добавляем прокрутку на случай очень маленьких экранов */
         }
 
         .congrats-screen.visible {
@@ -124,13 +124,13 @@
             pointer-events: all;
         }
 
-        /* контейнер с основным текстом */
+        /* контейнер с основным текстом - приподнят вверх */
         .greeting-card {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border-radius: 70px 20px 70px 20px;
-            padding: 2rem 2rem;
+            padding: 2rem 2rem; /* Уменьшен padding */
             max-width: 700px;
             width: 90%;
             text-align: center;
@@ -138,7 +138,7 @@
             box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(255, 255, 255, 0.3) inset;
             animation: float 4s infinite ease-in-out;
             transition: background 0.3s, border-color 0.3s;
-            margin-top: 5vh;
+            margin-top: 5vh; /* Отступ сверху */
             margin-bottom: 2vh;
         }
 
@@ -149,7 +149,7 @@
         }
 
         .greeting-card h2 {
-            font-size: 3.5rem;
+            font-size: 3.5rem; /* Уменьшен размер */
             font-weight: 800;
             line-height: 1.2;
             text-shadow: 0 5px 20px currentColor;
@@ -159,14 +159,14 @@
         }
 
         .greeting-card p {
-            font-size: 1.8rem;
+            font-size: 1.8rem; /* Уменьшен размер */
             font-weight: 500;
             margin-bottom: 1.2rem;
             opacity: 0.95;
         }
 
         .flower-emoji {
-            font-size: 2.8rem;
+            font-size: 2.8rem; /* Уменьшен размер */
             filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3));
             animation: rotateFlower 6s infinite;
         }
@@ -193,7 +193,7 @@
             max-width: min(500px, 90%);
             width: auto;
             height: auto;
-            max-height: 30vh;
+            max-height: 30vh; /* Ограничиваем высоту */
             border-radius: 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.3);
             object-fit: cover;
@@ -205,31 +205,7 @@
             transform: scale(1.02);
         }
 
-        /* заглушка для картинки */
-        .image-placeholder {
-            max-width: min(500px, 90%);
-            width: 100%;
-            height: 30vh;
-            border-radius: 30px;
-            background: linear-gradient(135deg, #f9d423, #fdaa8b);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 2rem;
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .placeholder-text {
-            font-size: 1.2rem;
-            margin-top: 0.5rem;
-            opacity: 0.9;
-        }
-
-        /* падающие сердечки */
+        /* падающие сердечки (точки) */
         #hearts-container {
             position: fixed;
             top: 0;
@@ -273,7 +249,7 @@
             display: none !important;
         }
 
-        /* Адаптив */
+        /* Адаптив для мобильных устройств */
         @media (max-width: 768px) {
             .greeting-card {
                 padding: 1.5rem 1.2rem;
@@ -292,8 +268,7 @@
                 font-size: 2.2rem;
             }
             
-            .congrats-image,
-            .image-placeholder {
+            .congrats-image {
                 max-height: 25vh;
                 border-radius: 20px;
             }
@@ -318,8 +293,7 @@
                 font-size: 1.8rem;
             }
             
-            .congrats-image,
-            .image-placeholder {
+            .congrats-image {
                 max-height: 22vh;
                 max-width: 95%;
                 border-radius: 15px;
@@ -334,17 +308,18 @@
             }
         }
 
+        /* Для очень высоких экранов */
         @media (min-height: 900px) {
             .greeting-card {
                 margin-top: 8vh;
             }
             
-            .congrats-image,
-            .image-placeholder {
+            .congrats-image {
                 max-height: 25vh;
             }
         }
 
+        /* Для очень низких экранов */
         @media (max-height: 700px) {
             .greeting-card {
                 padding: 1rem;
@@ -365,8 +340,7 @@
                 font-size: 1.5rem;
             }
             
-            .congrats-image,
-            .image-placeholder {
+            .congrats-image {
                 max-height: 20vh;
             }
         }
@@ -382,18 +356,20 @@
         <div class="error-message" id="errorMsg"></div>
     </div>
 
-    <!-- ПОЗДРАВЛЕНИЕ -->
+    <!-- ПОЗДРАВЛЕНИЕ (изначально скрыто) -->
     <div class="congrats-screen" id="congratsScreen">
         <div class="greeting-card" id="greetingCard">
             <h2 id="greetingTitle">С 8 марта!</h2>
             <p id="greetingText">Пусть сбываются мечты</p>
             <div class="flower-emoji">🌸🌷🌺</div>
         </div>
-        <div class="image-container" id="imageContainer">
-            <!-- Картинка будет добавлена через JavaScript с обработкой ошибок -->
+        <div class="image-container">
+<img src="photo_2026-02-28_16-17-09.jpg" 
+     alt="С 8 марта! Весенние цветы" 
+     class="congrats-image"
+     loading="lazy">
         </div>
     </div>
-    
     <div id="hearts-container"></div>
     <canvas id="fireworks-canvas"></canvas>
 
@@ -412,16 +388,16 @@
                 '10': "01qazwsxed_"
             };
             const themeColors = {
-                1: { bg: '#FCE570', card: '#FFE55C', text: '#B8860B', heart: '#FCE570' },
-                2: { bg: '#7BD3EA', card: '#A4E5FF', text: '#025E8F', heart: '#7BD3EA' },
-                3: { bg: '#FF6B6B', card: '#FF8A8A', text: '#A50000', heart: '#FF6B6B' },
-                4: { bg: '#A7E0A0', card: '#C0F0B8', text: '#1F6D1F', heart: '#A7E0A0' },
-                5: { bg: '#FFB27F', card: '#FFCA9F', text: '#B14500', heart: '#FFB27F' },
-                6: { bg: '#D9A5FF', card: '#E9C2FF', text: '#4B0082', heart: '#D9A5FF' },
-                7: { bg: '#FF99C8', card: '#FFB8D9', text: '#B32E5F', heart: '#FF99C8' },
-                8: { bg: '#A6E0FA', card: '#C2ECFF', text: '#005A8C', heart: '#A6E0FA' },
-                9: { bg: '#F5E56B', card: '#FFF0A5', text: '#8B6B00', heart: '#F5E56B' },
-                10: { bg: '#B0E57C', card: '#D0F0B0', text: '#236B2E', heart: '#B0E57C' }
+                1: { bg: '#FCE570', card: '#FFE55C', text: '#B8860B', heart: '#FCE570' },        // желто-золотой
+                2: { bg: '#7BD3EA', card: '#A4E5FF', text: '#025E8F', heart: '#7BD3EA' },        // сине-голубой
+                3: { bg: '#FF6B6B', card: '#FF8A8A', text: '#A50000', heart: '#FF6B6B' },        // ярко-красный
+                4: { bg: '#A7E0A0', card: '#C0F0B8', text: '#1F6D1F', heart: '#A7E0A0' },        // сочно-зеленый
+                5: { bg: '#FFB27F', card: '#FFCA9F', text: '#B14500', heart: '#FFB27F' },        // оранжевый
+                6: { bg: '#D9A5FF', card: '#E9C2FF', text: '#4B0082', heart: '#D9A5FF' },        // фиолетовый
+                7: { bg: '#FF99C8', card: '#FFB8D9', text: '#B32E5F', heart: '#FF99C8' },        // розовый
+                8: { bg: '#A6E0FA', card: '#C2ECFF', text: '#005A8C', heart: '#A6E0FA' },        // небесно-голубой
+                9: { bg: '#F5E56B', card: '#FFF0A5', text: '#8B6B00', heart: '#F5E56B' },        // лимонный
+                10: { bg: '#B0E57C', card: '#D0F0B0', text: '#236B2E', heart: '#B0E57C' }        // светло-зеленый (лайм)
             };
 
             // элементы
@@ -432,7 +408,6 @@
             const greetingCard = document.getElementById('greetingCard');
             const greetingTitle = document.getElementById('greetingTitle');
             const greetingText = document.getElementById('greetingText');
-            const imageContainer = document.getElementById('imageContainer');
             const bodyEl = document.body;
             const heartsContainer = document.getElementById('hearts-container');
 
@@ -445,72 +420,36 @@
 
             // для падающих сердец
             let heartInterval = null;
-            let currentHeartColor = '#FCE570';
-
-            // ---- функции для отображения картинки с запасным вариантом ----
-            function loadImageWithFallback(container, imageUrl) {
-                // Очищаем контейнер
-                container.innerHTML = '';
-                
-                // Создаем элемент изображения
-                const img = new Image();
-                
-                // Функция для создания заглушки
-                const showPlaceholder = () => {
-                    container.innerHTML = `
-                        <div class="image-placeholder">
-                            <div>🌸🌷🌺</div>
-                            <div class="placeholder-text">С 8 марта!</div>
-                        </div>
-                    `;
-                };
-                
-                // Обработчик успешной загрузки
-                img.onload = function() {
-                    // Изображение загрузилось успешно
-                    img.className = 'congrats-image';
-                    container.appendChild(img);
-                };
-                
-                // Обработчик ошибки загрузки
-                img.onerror = function() {
-                    console.log('Не удалось загрузить изображение, используем заглушку');
-                    showPlaceholder();
-                };
-                
-                // Устанавливаем атрибуты и начинаем загрузку
-                img.src = imageUrl;
-                img.alt = 'С 8 марта! Весенние цветы';
-                img.loading = 'lazy';
-                
-                // Добавляем crossorigin атрибут для решения проблем с CORS
-                img.crossOrigin = 'anonymous';
-            }
+            let currentHeartColor = '#FCE570'; // по умолчанию
 
             // ---- функции для сердец ----
             function startHearts(color) {
                 if (heartInterval) clearInterval(heartInterval);
                 currentHeartColor = color;
+                // создаём 30 сердец с задержкой
                 for (let i = 0; i < 35; i++) {
                     setTimeout(() => createHeart(color), i * 80);
                 }
+                // бесконечное создание
                 heartInterval = setInterval(() => createHeart(color), 380);
             }
 
             function createHeart(color) {
                 const heart = document.createElement('div');
                 heart.className = 'heart';
+                // рандомный смайлик сердца
                 const hearts = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤍', '💖', '💗', '💓', '💞'];
                 const randomHeart = hearts[Math.floor(Math.random() * hearts.length)];
                 heart.textContent = randomHeart;
                 heart.style.left = Math.random() * 100 + '%';
-                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's'; // 4-7 сек
                 heart.style.fontSize = (Math.random() * 1.8 + 1.2) + 'rem';
-                heart.style.color = color;
+                heart.style.color = color; // цвет фона (текущий)
                 heart.style.textShadow = `0 0 15px ${color}`;
                 heart.style.opacity = '0.9';
                 heartsContainer.appendChild(heart);
 
+                // удалить после окончания анимации
                 setTimeout(() => {
                     if (heart.parentNode) heart.remove();
                 }, 8000);
@@ -521,14 +460,16 @@
                     clearInterval(heartInterval);
                     heartInterval = null;
                 }
+                // удаляем все существующие сердца
                 heartsContainer.innerHTML = '';
             }
 
-            // ---- функции салюта ----
+            // ---- функции салюта (адаптировано под цвет) ----
             function startFireworks(primaryColor) {
                 if (fireworksActive) return;
                 fireworksActive = true;
 
+                // преобразуем цвет в формат rgb для разнообразия
                 const rgb = hexToRgb(primaryColor) || { r: 255, g: 200, b: 100 };
                 const palette = [primaryColor, `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`, '#FFFFFF', '#FFD700', '#FFA500'];
 
@@ -554,7 +495,7 @@
                     update() {
                         this.x += this.vx;
                         this.y += this.vy;
-                        this.vy += 0.05;
+                        this.vy += 0.05; // гравитация
                         this.alpha -= this.decay;
                         this.life -= this.decay;
                     }
@@ -569,7 +510,7 @@
 
                 function createFirework() {
                     const x = Math.random() * canvas.width;
-                    const y = Math.random() * canvas.height * 0.6;
+                    const y = Math.random() * canvas.height * 0.6; // выше середины
                     const count = 40 + Math.floor(Math.random() * 40);
                     const baseColor = palette[Math.floor(Math.random() * palette.length)];
                     for (let i = 0; i < count; i++) {
@@ -596,17 +537,19 @@
                     animationFrame = requestAnimationFrame(animateFireworks);
                 }
 
+                // запускаем создание фейерверков каждые 0.7 сек
                 const fireInterval = setInterval(() => {
                     if (!fireworksActive) {
                         clearInterval(fireInterval);
                         return;
                     }
                     createFirework();
-                    if (Math.random() > 0.5) createFirework();
+                    if (Math.random() > 0.5) createFirework(); // иногда двойной
                 }, 600);
 
                 animateFireworks();
 
+                // останавливать салют не будем, пусть работает, но сохраним для сброса
                 window.fireworkCleanup = () => {
                     fireworksActive = false;
                     clearInterval(fireInterval);
@@ -619,6 +562,7 @@
                 };
             }
 
+            // вспомогательное: hex -> rgb
             function hexToRgb(hex) {
                 const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
                 return result ? {
@@ -629,29 +573,25 @@
             }
 
             // ---- обработка успешного кода ----
-            function applyCode(codeKey) {
+            function applyCode( codeKey ) {
                 const key = parseInt(codeKey);
                 if (key < 1 || key > 10) return;
 
                 const colors = themeColors[key];
-                
                 // фон body
                 bodyEl.style.backgroundColor = colors.bg;
-                bodyEl.style.background = colors.bg;
-                
+                bodyEl.style.background = colors.bg; // убираем градиент
                 // карточка поздравления
                 greetingCard.style.backgroundColor = colors.card;
                 greetingCard.style.borderColor = colors.text;
                 greetingCard.style.color = colors.text;
-                
                 // текст внутри карточки
                 greetingTitle.style.color = colors.text;
                 greetingText.style.color = colors.text;
-                
-                // цвет падающих сердец
+                // цвет падающих сердец = цвет фона (как просили)
                 currentHeartColor = colors.bg;
 
-                // меняем текст поздравления
+                // меняем текст поздравления (разнообразие)
                 const messages = [
                     { title: 'С 8 марта!', text: 'Сияй ярко ✨' },
                     { title: 'С праздником весны!', text: 'Будь счастлива!' },
@@ -667,14 +607,11 @@
                 codeScreen.classList.add('hidden');
                 congratsScreen.classList.add('visible');
 
-                // загружаем картинку с обработкой ошибок
-                loadImageWithFallback(imageContainer, 'https://i.postimg.cc/HWrQX6Wb/IMG-5769.jpg');
-
-                // сердечки
+                // останавливаем предыдущие сердечки, запускаем новые
                 stopHearts();
                 startHearts(colors.bg);
 
-                // фейерверки
+                // фейерверки (передаем цвет фона как основной)
                 if (window.fireworkCleanup) window.fireworkCleanup();
                 startFireworks(colors.bg);
             }
@@ -702,12 +639,14 @@
                 }
             });
 
-            // очистка
+            // чистый старт: остановка сердец и салютов, если вдруг
             stopHearts();
             if (window.fireworkCleanup) window.fireworkCleanup();
 
-            // начальный градиент
+            // Эффект лёгкого градиента на старте (чтобы не было черноты)
             bodyEl.style.background = 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)';
+
+            // Плавающие подсказки (для красоты можно добавить фоновые шарики, но и так ок)
 
         })();
     </script>
